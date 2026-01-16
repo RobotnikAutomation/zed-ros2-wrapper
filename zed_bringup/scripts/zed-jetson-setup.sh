@@ -49,7 +49,7 @@ copy_file check_clock_sync.sh
 
 echo "Install chrony to manage NTP"
 sudo apt-get install chrony -y
-sudo cp "$SCRIPT_DIR/chrony/chrony.conf" /etc/chrony/chrony.conf
+sudo cp "$SCRIPT_DIR/chrony/chrony_client.conf" /etc/chrony/chrony.conf
 sudo systemctl enable chrony
 sudo systemctl start chrony
 
