@@ -20,6 +20,27 @@ export RMW_IMPLEMENTATION=rmw_cyclonedds_cpp
 source /opt/ros/$ROS_DISTRO/setup.bash
 source $JETSON_WORKSPACE/install/setup.bash
 
+TIMEOUT=60  # seconds to wait before giving up
+START_TIME=$(date +%s)
+
+while true; do
+    if $HOME/check_clock_sync.sh; then
+        echo "Clock sync successful!"
+        break
+    else
+        echo "Waiting for clock sync..."
+    fi
+
+    sleep 1
+
+    NOW=$(date +%s)
+    ELAPSED=$(( NOW - START_TIME ))
+    if (( ELAPSED >= TIMEOUT )); then
+        echo "Timeout reached ($TIMEOUT seconds). Not restarting running screens."
+        exit 1
+    fi
+done
+
 echo ""
 echo -e "ROS_DOMAIN_ID\t\t= ${ROS_DOMAIN_ID}"
 echo -e "RMW_IMPLEMENTATION\t= $RMW_IMPLEMENTATION" 
