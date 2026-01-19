@@ -17,7 +17,7 @@ export JETSON_CAMERA_2_DEVICE_ID=0
 
 export ROS_DOMAIN_ID=38
 export RMW_IMPLEMENTATION=rmw_cyclonedds_cpp
-source /opt/ros/$ROS_DISTRO/setup.bash
+source /opt/ros/humble/setup.bash
 source $JETSON_WORKSPACE/install/setup.bash
 
 TIMEOUT=60  # seconds to wait before giving up
@@ -25,7 +25,6 @@ START_TIME=$(date +%s)
 
 while true; do
     if $HOME/check_clock_sync.sh; then
-        echo "Clock sync successful!"
         break
     else
         echo "Waiting for clock sync..."
@@ -48,5 +47,5 @@ echo -e "WORKSPACE\t\t= $JETSON_WORKSPACE/install/setup.bash"
 echo ""
 
 killall screen
-sleep 2;
+sleep 5;
 screen -S zed -d -m ros2 launch zed_bringup zed_complete.launch.py;

@@ -30,10 +30,10 @@ fi
 # --- Evaluate and print results ---
 
 if [[ "$leap_status" == "Normal" ]] && (( $(echo "$abs_offset < $THRESHOLD" | bc -l) )) && [[ $ntp_server_ok -eq 1 ]]; then
-    echo "✅ Clocks are synchronized and NTP server is correctly set to '$SERVER'."
-    echo "Leap status: $leap_status"
-    echo "System time offset: $time_offset seconds"
-    echo "Current NTP server: $current_server"
+    echo "✅ Clocks are synchronized (offset: $time_offset seconds) and NTP server is correctly set to '$SERVER'."
+    # echo "Leap status: $leap_status"
+    # echo "System time offset: $time_offset seconds"
+    # echo "Current NTP server: $current_server"
     exit 0
 else
     echo "❌ Clock sync or NTP server check failed."
