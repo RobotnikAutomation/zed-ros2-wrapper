@@ -318,7 +318,12 @@ def launch_setup(context, *args, **kwargs):
             plugin='stereolabs::ZedCamera',
             name=node_name_val,
             parameters=node_parameters,
-            extra_arguments=[{'use_intra_process_comms': enable_ipc}]
+            extra_arguments=[{'use_intra_process_comms': enable_ipc}],
+            remappings=[
+                (f'/{namespace_val}/{node_name_val}/rgb/color/rect/image', f'/{namespace_val}/{node_name_val}/color/image_raw'),
+                (f'/{namespace_val}/{node_name_val}/point_cloud/cloud_registered', f'/{namespace_val}/{node_name_val}/points'),
+                (f'/{namespace_val}/{node_name_val}/depth/depth_registered', f'/{namespace_val}/{node_name_val}/depth/image_raw'),
+            ],
         )
     else: # camera_model_val == 'zedxonegs' or camera_model_val == 'zedxone4k' or camera_model_val == 'zedxonehdr'
         zed_wrapper_component = ComposableNode(
@@ -327,7 +332,12 @@ def launch_setup(context, *args, **kwargs):
             plugin='stereolabs::ZedCameraOne',
             name=node_name_val,
             parameters=node_parameters,
-            extra_arguments=[{'use_intra_process_comms': enable_ipc}]
+            extra_arguments=[{'use_intra_process_comms': enable_ipc}],
+            remappings=[
+                (f'/{namespace_val}/{node_name_val}/rgb/color/rect/image', f'/{namespace_val}/{node_name_val}/color/image_raw'),
+                (f'/{namespace_val}/{node_name_val}/point_cloud/cloud_registered', f'/{namespace_val}/{node_name_val}/points'),
+                (f'/{namespace_val}/{node_name_val}/depth/depth_registered', f'/{namespace_val}/{node_name_val}/depth/image_raw'),
+            ],
         )
     
     full_container_name = '/' + namespace_val + '/' + container_name_val
