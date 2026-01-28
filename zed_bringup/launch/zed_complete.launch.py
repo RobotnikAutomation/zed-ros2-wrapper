@@ -3,6 +3,7 @@ from launch.launch_description_sources import PythonLaunchDescriptionSource
 import os
 from launch.substitutions import LaunchConfiguration
 from launch.substitutions import EnvironmentVariable
+from launch.substitutions import TextSubstitution
 from launch.actions import DeclareLaunchArgument, IncludeLaunchDescription
 from launch_ros.actions import PushRosNamespace
 from launch.actions import GroupAction
@@ -29,13 +30,12 @@ def generate_launch_description():
             os.path.join(get_package_share_directory('zed_bringup'), 'launch/', 'zed_camera.launch.py')
         ),
         launch_arguments={
-            'camera_name': LaunchConfiguration('camera_id_1'),
+            'camera_name': PythonExpression(['"', LaunchConfiguration('robot_id'), TextSubstitution(text='_'), LaunchConfiguration('camera_id_1'), '"']),
             'camera_model': LaunchConfiguration('camera_model_1'),
             'namespace': LaunchConfiguration('robot_id'),
             'node_name': LaunchConfiguration('camera_id_1'),
             'serial_number': LaunchConfiguration('camera_device_id_1'),
-            'publish_urdf': 'true',
-            'publish_tf': 'true',
+            'publish_urdf': 'false',
         }.items(),
         condition=IfCondition(PythonExpression(["'", LaunchConfiguration('camera_model_1'), "' != 'none'"]))
     )
@@ -45,13 +45,12 @@ def generate_launch_description():
             os.path.join(get_package_share_directory('zed_bringup'), 'launch/', 'zed_camera.launch.py')
         ),
         launch_arguments={
-            'camera_name': LaunchConfiguration('camera_id_2'),
+            'camera_name': PythonExpression(['"', LaunchConfiguration('robot_id'), TextSubstitution(text='_'), LaunchConfiguration('camera_id_2'), '"']),
             'camera_model': LaunchConfiguration('camera_model_2'),
             'namespace': LaunchConfiguration('robot_id'),
             'node_name': LaunchConfiguration('camera_id_2'),
             'serial_number': LaunchConfiguration('camera_device_id_2'),
-            'publish_urdf': 'true',
-            'publish_tf': 'true',
+            'publish_urdf': 'false',
         }.items(),
         condition=IfCondition(PythonExpression(["'", LaunchConfiguration('camera_model_2'), "' != 'none'"]))
     )

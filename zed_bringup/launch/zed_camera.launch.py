@@ -152,8 +152,9 @@ def launch_setup(context, *args, **kwargs):
             ]
     
     if(namespace_val == ''):
-        namespace_val = camera_name_val
-    else:
+        node_name_val = camera_name_val
+
+    if (node_name_val == ''):
         node_name_val = camera_name_val
     
     # Common configuration file
@@ -244,7 +245,7 @@ def launch_setup(context, *args, **kwargs):
 
     # ROS 2 Component Container
     if(container_name_val == ''):
-        container_name_val=camera_name_val + '_container'
+        container_name_val=node_name_val + '_container'
         distro = os.environ['ROS_DISTRO']
         if distro == 'foxy':
             # Foxy does not support the isolated mode
@@ -299,6 +300,28 @@ def launch_setup(context, *args, **kwargs):
                 'general.virtual_serial_numbers': serial_numbers_val,
                 'general.virtual_camera_ids': camera_ids_val
             }
+    )
+
+    node_parameters.append(
+        {
+            'tf.base_frame_id': namespace_val + '_' + node_name_val + '_base_link',
+            'tf.center_frame_id': namespace_val + '_' + node_name_val + '_center_frame',
+            'tf.left_cam_frame_id': namespace_val + '_' + node_name_val + '_left_camera_frame',
+            'tf.left_cam_opt_frame_id': namespace_val + '_' + node_name_val + '_left_camera_optical_frame',
+            'tf.right_cam_frame_id': namespace_val + '_' + node_name_val + '_right_camera_frame',
+            'tf.right_cam_opt_frame_id': namespace_val + '_' + node_name_val + '_right_camera_optical_frame',
+            'tf.imu_frame_id': namespace_val + '_' + node_name_val + '_imu_frame',
+            'tf.depth_frame_id': namespace_val + '_' + node_name_val + '_left_camera_frame',
+            'tf.depth_opt_frame_id': namespace_val + '_' + node_name_val + '_left_camera_optical_frame',
+            'tf.pointcloud_frame_id': namespace_val + '_' + node_name_val + '_left_camera_frame',
+            'tf.map_frame_id' : namespace_val + '_map',
+            'tf.odom_frame_id' : namespace_val + '_odom',
+            'tf.baro_frame_id': namespace_val + '_' + node_name_val + '_center_frame',
+            'tf.mag_frame_id': namespace_val + '_' + node_name_val + '_imu_frame',
+            'tf.temp_left_frame_id': namespace_val + '_' + node_name_val + '_left_camera_frame',
+            'tf.temp_right_frame_id': namespace_val + '_' + node_name_val + '_right_camera_frame',
+
+        }
     )
 
     # ZED Wrapper component
