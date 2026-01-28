@@ -62,7 +62,8 @@ protected:
   void getBodyTrkParams();
   void getStreamingServerParams();
   void getAdvancedParams();
-
+  void initializeDefaultFrameIds();
+  void loadAllFullTFNamesFromParameters();
   void setTFCoordFrameNames();
   void initPublishers();
   void initVideoDepthPublishers();

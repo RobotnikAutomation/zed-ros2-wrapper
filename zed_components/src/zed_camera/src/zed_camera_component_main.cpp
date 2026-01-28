@@ -552,6 +552,8 @@ void ZedCamera::initParameters()
   getStreamingServerParams();
 
   getAdvancedParams();
+
+  loadAllFullTFNamesFromParameters();
 }
 
 std::string ZedCamera::parseRoiPoly(
@@ -1458,9 +1460,6 @@ void ZedCamera::getPosTrackingParams()
     get_logger(), " * Positional tracking mode: "
       << sl::toString(mPosTrkMode).c_str());
 
-  mBaseFrameId = mCameraName;
-  mBaseFrameId += "_camera_link";
-
   sl_tools::getParam(
     shared_from_this(), "pos_tracking.map_frame", mMapFrameId,
     mMapFrameId, " * Map frame id: ");
@@ -1651,8 +1650,6 @@ void ZedCamera::getGnssFusionParams()
     " * GNSS fusion enabled: ");
 
   if (mGnssFusionEnabled) {
-    mGnssFrameId = mCameraName + "_gnss_link";
-
     sl_tools::getParam(
       shared_from_this(), "gnss_fusion.gnss_fix_topic",
       mGnssTopic, mGnssTopic, " * GNSS topic name: ");
@@ -1982,9 +1979,12 @@ rcl_interfaces::msg::SetParametersResult ZedCamera::callback_dynamicParamChange(
   return result;
 }
 
-void ZedCamera::setTFCoordFrameNames()
+void ZedCamera::initializeDefaultFrameIds()
 {
-  // ----> Coordinate frames
+  mBaseFrameId = mCameraName + "_camera_link";
+
+  mGnssFrameId = mCameraName + "_gnss_link";
+
   mCenterFrameId = mCameraName + "_camera_center";
   mLeftCamFrameId = mCameraName + "_left_camera_frame";
   mLeftCamOptFrameId = mCameraName + "_left_camera_frame_optical";
@@ -1992,15 +1992,61 @@ void ZedCamera::setTFCoordFrameNames()
   mRightCamOptFrameId = mCameraName + "_right_camera_frame_optical";
 
   mImuFrameId = mCameraName + "_imu_link";
-  mBaroFrameId = mCenterFrameId;         // mCameraName + "_baro_link";
-  mMagFrameId = mImuFrameId;             // mCameraName + "_mag_link";
-  mTempLeftFrameId = mLeftCamFrameId;    // mCameraName + "_temp_left_link";
-  mTempRightFrameId = mRightCamFrameId;  // mCameraName + "_temp_right_link";
+  mBaroFrameId = mCenterFrameId;         // usually same as center frame
+  mMagFrameId = mImuFrameId;             // usually same as imu frame
+  mTempLeftFrameId = mLeftCamFrameId;    // default to left cam frame
+  mTempRightFrameId = mRightCamFrameId;  // default to right cam frame
 
   mDepthFrameId = mLeftCamFrameId;
   mDepthOptFrameId = mLeftCamOptFrameId;
   mPointCloudFrameId = mDepthFrameId;
+}
 
+void ZedCamera::loadAllFullTFNamesFromParameters()
+{
+  initializeDefaultFrameIds();
+  using rcl_interfaces::msg::ParameterDescriptor;
+  ParameterDescriptor read_only_descriptor;
+  read_only_descriptor.read_only = true;
+
+  struct ParamEntry {
+    const char * param_name;
+    std::string & storage_ref;
+  };
+
+  ParamEntry full_params[] = {
+    {"tf.base_frame_id", mBaseFrameId},
+    {"tf.center_frame_id", mCenterFrameId},
+    {"tf.right_cam_frame_id", mRightCamFrameId},
+    {"tf.right_cam_opt_frame_id", mRightCamOptFrameId},
+    {"tf.left_cam_frame_id", mLeftCamFrameId},
+    {"tf.left_cam_opt_frame_id", mLeftCamOptFrameId},
+    {"tf.imu_frame_id", mImuFrameId},
+    {"tf.baro_frame_id", mBaroFrameId},
+    {"tf.mag_frame_id", mMagFrameId},
+    {"tf.temp_left_frame_id", mTempLeftFrameId},
+    {"tf.temp_right_frame_id", mTempRightFrameId},
+    {"tf.depth_frame_id", mDepthFrameId},
+    {"tf.depth_opt_frame_id", mDepthOptFrameId},
+    {"tf.pointcloud_frame_id", mPointCloudFrameId},
+    {"tf.utm_frame_id", mUtmFrameId},
+    {"tf.map_frame_id", mMapFrameId},
+    {"tf.odom_frame_id", mOdomFrameId},
+    {"tf.gnss_frame_id", mGnssFrameId},
+    {"tf.gnss_origin_frame_id", mGnssOriginFrameId}
+  };
+
+  for (auto & entry : full_params) {
+    declare_parameter(entry.param_name, rclcpp::ParameterValue(entry.storage_ref), read_only_descriptor);
+    if (!get_parameter(entry.param_name, entry.storage_ref)) {
+      RCLCPP_WARN(get_logger(), "Parameter '%s' missing or invalid, using default '%s'",
+                  entry.param_name, entry.storage_ref.c_str());
+    }
+  }
+}
+
+void ZedCamera::setTFCoordFrameNames()
+{
   // Print TF frames
   RCLCPP_INFO_STREAM(get_logger(), "=== TF FRAMES ===");
   RCLCPP_INFO_STREAM(get_logger(), " * Map\t\t\t-> " << mMapFrameId);
