@@ -45,7 +45,9 @@ copy_file() {
 
 echo "Install jetson scripts to home directory"
 copy_file bringup.sh
+copy_file jetson_params.env
 copy_file check_clock_sync.sh
+copy_file cyclonedds.xml
 
 echo "Install chrony to manage NTP"
 sudo apt-get install chrony -y
