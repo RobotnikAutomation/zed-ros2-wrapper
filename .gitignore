@@ -96,3 +96,11 @@ CMakeLists.txt.user*
 
 # TMP folders
 docker/tmp_sources
+
+# Vim swap files
+*.swp
+*.swo
+*.swn
+
+# Python cache
+__pycache__/
